@@ -26,14 +26,16 @@ header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 header("Cache-Control: public, max-age=$cacheMinutes");
 
 // redirect to demo site if user is not given
-if (!isset($_REQUEST["user"])) {
+if (!isset($_SERVER["USER"]) && !isset($_REQUEST["user"])) {
     header("Location: demo/");
     exit();
 }
 
 try {
+    // Take the server value for USER or the request parameter 'user'
+    // and sanitize it to allow only alphanumeric characters and hyphens.
     // get streak stats for user given in query string
-    $user = preg_replace("/[^a-zA-Z0-9\-]/", "", $_REQUEST["user"]);
+    $user = preg_replace("/[^a-zA-Z0-9\-]/", "", $_SERVER["USER"] ?? $_REQUEST["user"]);
     $startingYear = isset($_REQUEST["starting_year"]) ? intval($_REQUEST["starting_year"]) : null;
     $contributionGraphs = getContributionGraphs($user, $startingYear);
     $contributions = getContributionDates($contributionGraphs);
